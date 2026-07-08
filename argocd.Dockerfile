@@ -1,1 +1,1 @@
-FROM docker.io/argoproj/argocd:v2.13.0
+FROM argoproj/argocd:v2.13.0
