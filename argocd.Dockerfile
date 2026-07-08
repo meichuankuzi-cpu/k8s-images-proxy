@@ -1,1 +1,1 @@
-FROM argoproj/argocd:v2.13.0
+FROM mcr.microsoft.com/oss/kubernetes/argoproj/argo-cd:v2.13.0
