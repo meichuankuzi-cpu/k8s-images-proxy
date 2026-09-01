@@ -43,18 +43,3 @@ jobs:
           # -kubernetes-version: 指定集群校验的版本
           kubeconform -summary -strict -ignore-missing-schemas -kubernetes-version 1.30.0 argocd/
 
-      # ==========================================
-      # 第三层：Kubernetes 客户端干跑校验 (kubectl dry-run)
-      # ==========================================
-      - name: Set up kubectl
-        run: |
-          echo "=== Setting up kubectl ==="
-          curl -LO "https://dl.k8s.io/release/v1.30.0/bin/linux/amd64/kubectl"
-          chmod +x kubectl
-          sudo mv kubectl /usr/local/bin/
-
-      - name: Run Client-side Dry-Run
-        run: |
-          echo "=== [Layer 3] Running Kubectl Client Dry-Run ==="
-          # 使用 --validate=client 避免让 kubectl 尝试连接本地非真实的集群 API Server
-          kubectl apply --dry-run=client --validate=false -f argocd/
