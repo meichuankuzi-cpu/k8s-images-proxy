@@ -23,8 +23,8 @@ jobs:
       - name: Run Yamllint
         run: |
           echo "=== [Layer 1] Running Yamllint (Syntax & Style Check) ==="
-          # 对 manifests 目录下的 yaml 文件进行规范检查
-          yamllint manifests/
+          # 对 argocd 目录下的 yaml 文件进行规范检查
+          yamllint argocd/
 
       # ==========================================
       # 第二层：Kubernetes API Schema 规范校验 (Kubeconform)
@@ -57,4 +57,4 @@ jobs:
         run: |
           echo "=== [Layer 3] Running Kubectl Client Dry-Run ==="
           # 利用 Kubernetes 官方客户端解析并验证清单的合法性
-          kubectl apply --dry-run=client -f manifests/
+          kubectl apply --dry-run=client -f argocd/
