@@ -1,0 +1,34 @@
+name: Production YAML Validation
+
+on:
+  pull_request:
+    branches: [ "main", "master" ]
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 1. 安装 kubectl
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.30.0'
+
+      # 2. 运行 kubeconform 进行 API Schema 校验
+      - name: Run Kubeconform
+        uses: yannh/kubeconform-action@v4
+        with:
+          path: manifests/ # 指向你的 YAML 文件夹
+          kubernetes-version: '1.30.0'
+          strict: true
+
+      # 3. 运行集群模拟干跑校验 (Dry-run)
+      # 注意：CI 环境没有真实集群，通常会使用 kind 启动一个轻量集群，或者仅做 client 校验
+      - name: Client-side Dry-Run
+        run: |
+          kubectl apply --dry-run=client -f manifests/
