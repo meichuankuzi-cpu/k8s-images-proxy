@@ -56,5 +56,5 @@ jobs:
       - name: Run Client-side Dry-Run
         run: |
           echo "=== [Layer 3] Running Kubectl Client Dry-Run ==="
-          # 利用 Kubernetes 官方客户端解析并验证清单的合法性
-          kubectl apply --dry-run=client -f argocd/
+          # 使用 --validate=client 避免让 kubectl 尝试连接本地非真实的集群 API Server
+          kubectl apply --dry-run=client --validate=client -f argocd/
