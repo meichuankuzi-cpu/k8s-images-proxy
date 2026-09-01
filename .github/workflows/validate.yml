@@ -41,7 +41,7 @@ jobs:
           # -strict: 严格模式，禁止未知字段
           # -ignore-missing-schemas: 忽略自定义资源(CRD)等未收录的 schema
           # -kubernetes-version: 指定集群校验的版本
-          kubeconform -summary -strict -ignore-missing-schemas -kubernetes-version 1.30.0 manifests/
+          kubeconform -summary -strict -ignore-missing-schemas -kubernetes-version 1.30.0 argocd/
 
       # ==========================================
       # 第三层：Kubernetes 客户端干跑校验 (kubectl dry-run)
