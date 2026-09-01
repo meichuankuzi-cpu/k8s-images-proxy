@@ -5,4 +5,4 @@ metadata:
   labels:
     environment: test
     business-unit: core-finance
-    123: 123
+    a123a: a123a
