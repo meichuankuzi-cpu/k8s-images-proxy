@@ -1,4 +1,4 @@
-name: Production YAML Validation
+name: Production YAML Multi-Layer Validation
 
 on:
   pull_request:
@@ -13,22 +13,48 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 1. 安装 kubectl
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'v1.30.0'
-
-      # 2. 运行 kubeconform 进行 API Schema 校验
-      - name: Run Kubeconform
-        uses: yannh/kubeconform-action@v4
-        with:
-          path: manifests/ # 指向你的 YAML 文件夹
-          kubernetes-version: '1.30.0'
-          strict: true
-
-      # 3. 运行集群模拟干跑校验 (Dry-run)
-      # 注意：CI 环境没有真实集群，通常会使用 kind 启动一个轻量集群，或者仅做 client 校验
-      - name: Client-side Dry-Run
+      # ==========================================
+      # 第一层：语法与格式静态检查 (yamllint)
+      # ==========================================
+      - name: Set up Yamllint
         run: |
+          sudo apt-get update && sudo apt-get install -y yamllint
+
+      - name: Run Yamllint
+        run: |
+          echo "=== [Layer 1] Running Yamllint (Syntax & Style Check) ==="
+          # 对 manifests 目录下的 yaml 文件进行规范检查
+          yamllint manifests/
+
+      # ==========================================
+      # 第二层：Kubernetes API Schema 规范校验 (Kubeconform)
+      # ==========================================
+      - name: Install Kubeconform
+        run: |
+          echo "=== Installing Kubeconform ==="
+          curl -sSL https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz | tar xz
+          sudo mv kubeconform /usr/local/bin/
+
+      - name: Run Kubeconform
+        run: |
+          echo "=== [Layer 2] Running Kubeconform (API Schema Check) ==="
+          # -strict: 严格模式，禁止未知字段
+          # -ignore-missing-schemas: 忽略自定义资源(CRD)等未收录的 schema
+          # -kubernetes-version: 指定集群校验的版本
+          kubeconform -summary -strict -ignore-missing-schemas -kubernetes-version 1.30.0 manifests/
+
+      # ==========================================
+      # 第三层：Kubernetes 客户端干跑校验 (kubectl dry-run)
+      # ==========================================
+      - name: Set up kubectl
+        run: |
+          echo "=== Setting up kubectl ==="
+          curl -LO "https://dl.k8s.io/release/v1.30.0/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+      - name: Run Client-side Dry-Run
+        run: |
+          echo "=== [Layer 3] Running Kubectl Client Dry-Run ==="
+          # 利用 Kubernetes 官方客户端解析并验证清单的合法性
           kubectl apply --dry-run=client -f manifests/
