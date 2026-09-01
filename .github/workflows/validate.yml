@@ -23,7 +23,6 @@ jobs:
       - name: Run Yamllint
         run: |
           echo "=== [Layer 1] Running Yamllint (Syntax & Style Check) ==="
-          # 对 argocd 目录下的 yaml 文件进行规范检查
           yamllint argocd/
 
       # ==========================================
@@ -42,4 +41,3 @@ jobs:
           # -ignore-missing-schemas: 忽略自定义资源(CRD)等未收录的 schema
           # -kubernetes-version: 指定集群校验的版本
           kubeconform -summary -strict -ignore-missing-schemas -kubernetes-version 1.30.0 argocd/
-
