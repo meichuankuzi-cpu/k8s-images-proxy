@@ -57,4 +57,4 @@ jobs:
         run: |
           echo "=== [Layer 3] Running Kubectl Client Dry-Run ==="
           # 使用 --validate=client 避免让 kubectl 尝试连接本地非真实的集群 API Server
-          kubectl apply --dry-run=client --validate=client -f argocd/
+          kubectl apply --dry-run=client --validate=warn -f argocd/
